@@ -1,0 +1,65 @@
+---
+- name: clone repo
+  git:
+    repo: "{{ git_repo }}"
+    dest: /opt/{{ site_name }}/{{ site_name }}
+
+- name: setup virtualenv
+  pip:
+    requirements: /opt/{{ site_name }}/{{ site_name }}/requirements.txt
+    virtualenv: /opt/{{ site_name }}/venv
+    virtualenv_command: pyvenv
+
+- name: set options in site settings.py
+  lineinfile:
+    path: /opt/{{ site_name }}/{{ site_name }}/config/settings.py
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^EMAIL_HOST =.+$', line: "EMAIL_HOST = '{{ email_host }}'" }
+    - { regexp: '^EMAIL_PORT =.+$', line: "EMAIL_PORT = '{{ email_port }}'" }
+    - { regexp: '^DEBUG =.+$', line: 'DEBUG = False' }
+    - { regexp: '^PROD =.+$', line: 'PROD = True' }
+    - { regexp: '^ALLOWED_HOSTS =.+$', line: "ALLOWED_HOSTS = ['{% if subdomain_name is defined %}{{ subdomain_name }}.{% endif %}{{ domain_name }}']" }
+    - { regexp: '^ENTRY_POINT = .+$', line: "ENTRY_POINT = '/opt/{{ site_name }}/prokka/{{ prokka_entry }}'" }
+
+- name: generate secret key
+  shell: tr -d -c "a-zA-Z0-9" < /dev/urandom | head -c 64
+  register: ps
+
+- name: set secret key fact
+  set_fact:
+    secret_key: "{{ ps.stdout }}"
+
+- name: create secret stash
+  template:
+    src: secrets.json
+    dest: /opt/{{ site_name }}/{{ site_name }}/config/secrets.json
+
+- name: collect static
+  django_manage:
+    command: collectstatic
+    app_path: /opt/{{ site_name }}/{{ site_name }}
+    virtualenv: /opt/{{ site_name }}/venv
+
+- name: migrate database
+  django_manage:
+    command: migrate
+    app_path: /opt/{{ site_name }}/{{ site_name }}
+    virtualenv: /opt/{{ site_name }}/venv
+
+- name: set directory and file permissions
+  file:
+    path: /opt/{{ site_name }}/
+    owner: root
+    group: www-data
+    mode: 'o-rwx,g-w'
+    recurse: yes
+
+- name: create upload directory
+  file:
+    path: /opt/{{ site_name }}/{{ site_name }}/user_files/
+    state: directory
+    mode: 0770
+    owner: root
+    group: www-data

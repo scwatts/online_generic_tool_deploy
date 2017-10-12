@@ -1,0 +1,18 @@
+[Unit]
+Description={{ site_name }} rq worker
+After=syslog.target {{ site_name }}-queuer.service
+Requires={{ site_name }}-queuer.service
+
+[Service]
+WorkingDirectory=/opt/{{ site_name }}/{{ site_name }}/
+ExecStart=/opt/{{ site_name }}/venv/bin/python /opt/{{ site_name }}/{{ site_name }}/manage.py rqworker
+User=www-data
+Group=www-data
+Restart=on-failure
+KillSignal=SIGQUIT
+Type=simple
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=default.target

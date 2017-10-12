@@ -1,0 +1,16 @@
+---
+- name: copy nginx configuration
+  template:
+    src: site_configuration.txt
+    dest: /etc/nginx/sites-available/{{ domain_name }}.{{ subdomain_name }}
+
+- name: enable nginx configuration
+  file:
+    src: /etc/nginx/sites-available/{{ domain_name }}{% if subdomain_name is defined %}.{{ subdomain_name }}{% endif %}
+    dest: /etc/nginx/sites-enabled/{{ domain_name }}{% if subdomain_name is defined %}.{{ subdomain_name }}{% endif %}
+    state: link
+
+- name: restart nginx
+  systemd:
+    name: nginx
+    state: restarted

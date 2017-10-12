@@ -1,0 +1,12 @@
+[Unit]
+Description=Socket for {{ site_name }} uWSGI
+PartOf={{ site_name }}-uwsgi.service
+
+[Socket]
+ListenStream=/run/{{ site_name }}_uwsgi.socket
+SocketUser=www-data
+SocketGroup=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

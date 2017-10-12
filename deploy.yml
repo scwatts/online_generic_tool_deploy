@@ -1,0 +1,24 @@
+---
+- name: configure
+  hosts: all
+  remote_user: stephen
+  become: yes
+
+  # Prompt for sensitive variables
+  vars_prompt:
+    - name: 'email_password'
+      prompt: 'Email server password for existing user'
+      private: yes
+
+    - name: 'db_password'
+      prompt: 'Database password for new user'
+      private: yes
+
+  roles:
+    - common
+    - postgres
+    - site
+    - rq_services
+    - prokka
+    - uwsgi
+    - nginx

@@ -1,0 +1,15 @@
+---
+- name: set up database
+  postgresql_db:
+    name: "{{ db_name }}"
+  become: yes
+  become_user: postgres
+
+- name: create database user and grant permissions
+  postgresql_user:
+     db: "{{ db_name }}"
+     name: "{{ db_user }}"
+     password: "{{ db_password }}"
+     priv: ALL
+  become: yes
+  become_user: postgres

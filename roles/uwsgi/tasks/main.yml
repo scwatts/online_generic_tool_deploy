@@ -1,0 +1,28 @@
+---
+- name: copy uwsgi configuration
+  template:
+    src: site_configuration.json
+    dest: /etc/uwsgi/apps-available/{{ site_name }}.json
+
+- name: enable uwsgi configuration
+  file:
+   src: /etc/uwsgi/apps-available/{{ site_name }}.json
+   dest: /etc/uwsgi/apps-enabled/{{ site_name }}.json
+   state: link
+
+- name: install uwsgi service unit file
+  template:
+    src: site_unitfile_service.txt
+    dest: /etc/systemd/system/{{ site_name }}-uwsgi.service
+
+- name: install uwsgi socket unit file
+  template:
+    src: site_unitfile_socket.txt
+    dest: /etc/systemd/system/{{ site_name }}-uwsgi.socket
+
+- name: enable and start uwsgi service
+  systemd:
+    name: "{{ site_name }}-uwsgi"
+    enabled: yes
+    state: restarted
+    daemon_reload: yes

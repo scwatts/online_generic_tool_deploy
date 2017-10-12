@@ -1,0 +1,17 @@
+[Unit]
+Description={{ site_name }} uWSGI
+After=syslog.target {{ site_name }}-uwsgi.socket
+Requires={{ site_name }}-uwsgi.socket
+
+[Service]
+ExecStart=/usr/bin/uwsgi --json /etc/uwsgi/apps-enabled/{{ site_name }}.json
+User=www-data
+Group=www-data
+Restart=on-failure
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=default.target

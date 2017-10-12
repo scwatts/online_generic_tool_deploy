@@ -1,0 +1,20 @@
+---
+- name: install rq queuer unit file
+  template:
+    src: queuer_unitfile_service.txt
+    dest: /etc/systemd/system/{{ site_name }}-queuer.service
+
+- name: install rq worker unit file
+  template:
+    src: worker_unitfile_service.txt
+    dest: /etc/systemd/system/{{ site_name }}-worker@.service
+
+- name: start queuer service
+  systemd:
+    name: '{{ site_name }}-queuer'
+    state: started
+    daemon_reload: yes
+
+- name: start worker service
+  shell: systemctl start {{ site_name }}-worker@{{ item }}.service
+  with_sequence: start=1 end={{ worker_count }}

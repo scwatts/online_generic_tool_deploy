@@ -1,0 +1,39 @@
+site_name: generic_online_tool
+domain_name: domain.tld
+subdomain_name: subdomain
+
+git_repo: https://github.com/scwatts/online_generic_tool.git
+
+email_host: domain.tld
+email_user: user@domain.tld
+email_port: 465
+
+db_name:
+db_user:
+
+ssl_cert_full: /path/to/fullchain.pem
+ssl_cert_private_key: /path/to/privkey.pem
+
+prokka_tarball: https://github.com/tseemann/prokka.git
+prokka_entry: bin/prokka
+
+worker_count: 1
+
+package_list:
+  - - git
+    - uwsgi
+    - uwsgi-plugin-python3
+    - redis-server
+    - postgresql
+    - nginx
+    - python3-psycopg2 # postgres module
+    - libdatetime-perl # prokka
+    - libxml-simple-perl # prokka
+    - libdigest-md5-perl # prokka
+    - default-jre # prokka
+    - bioperl # prokka
+
+service_list:
+  - - nginx
+    - postgresql
+    - redis-server
