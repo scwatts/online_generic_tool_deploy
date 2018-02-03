@@ -2,6 +2,9 @@
 - name: download and unpack stable release
   shell: curl -L {{ prokka_tarball }} | tar --transform 's#^prokka-[0-9]\+\.[0-9]\+#prokka#' --directory /opt/{{ site_name }} -zxvf -
 
+- name: remove broken perl module
+  shell: rm /opt/{{ site_name }}/prokka/perl5/Time/Piece.pm
+
 - name: index sequence databases
   shell: /opt/{{ site_name }}/prokka/bin/prokka --setupdb
 

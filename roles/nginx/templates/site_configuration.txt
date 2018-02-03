@@ -1,6 +1,6 @@
 server {
         listen 80;
-        listen 443 ssl;
+        listen 127.0.0.1:443 ssl;
 
         server_name {% if subdomain_name is defined %}{{ subdomain_name }}.{% endif %}{{ domain_name }} www.{% if subdomain_name is defined %}{{ subdomain_name }}.{% endif %}{{ domain_name }};
 
